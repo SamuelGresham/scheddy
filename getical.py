@@ -10,7 +10,7 @@ def getUniEvents ():
     cal = Calendar(requests.get(url).text)
 
     # Fetch the cached ical file from before 
-    cache_file = open("cache.txt", "r")
+    cache_file = open("py_envs/scheddy/cache.txt", "r")
     cache = cache_file.read()
     cache_file.close()
 

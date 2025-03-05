@@ -111,7 +111,7 @@ if __name__ == "__main__":
     if uniEvents:
         delOldEvents(service)
         writeNewEvents(service, uniEvents)
-        notify("Scheddy success!", f"Calendar updated with {len(uniEvents)}!", 0)
+        notify("Scheddy success!", f"Calendar updated with {len(uniEvents)}! events.", 0)
     else: 
         print("No changes to sched. Stopping.")
         notify("Scheddy success!", f"No changes were needed.", -2)
