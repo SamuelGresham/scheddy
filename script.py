@@ -100,7 +100,6 @@ def writeNewEvents(service, uniEvents):
         service.events().insert(calendarId='primary', body=eventDict).execute()
         print("    Writing " + str(event.name )+ " on " + str(event.begin) + " (" + str(i) + " of " + str(len(uniEvents)) +  ")")
 
-assert(True)
 
 if __name__ == "__main__":
     print("Authenticating...")
