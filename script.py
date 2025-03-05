@@ -16,11 +16,10 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.auth import default
 from getical import getUniEvents
+import consts
+import requests
 
 from ics import Calendar,Event
-
-import namemap
-
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
@@ -29,6 +28,16 @@ SCOPES = ["https://www.googleapis.com/auth/calendar"]
 def authenticate():
   creds, _ = default(scopes=SCOPES)
   return creds
+
+def notify (title, message, priority):
+    url = 'https://api.pushover.net/1/messages.json'
+    myobj = {'token': consts.API_KEY_Pushover,
+             'user': consts.USER_KEY_Pushover,
+             'message': message, 
+             'title': title, 
+             'priority': priority}
+
+    x = requests.post(url, json = myobj)
 
 
 def setEvent(creds):
@@ -96,11 +105,13 @@ if __name__ == "__main__":
     print("Authenticating...")
     cr = authenticate()
     service = build("calendar", "v3", credentials=cr)
-    print("Welcome to SamCalBot. Checking cache...")
+    print("Comparing cache...")
     uniEvents = getUniEvents()
 
     if uniEvents:
         delOldEvents(service)
         writeNewEvents(service, uniEvents)
+        notify("Scheddy success!", f"Calendar updated with {len(uniEvents)}!", 0)
     else: 
-        print("Looks like you're all up to date! Stopping...")
+        print("No changes to sched. Stopping.")
+        notify("Scheddy success!", f"No changes were needed.", -2)
