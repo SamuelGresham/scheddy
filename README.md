@@ -1,1 +1,2 @@
-# scheddy
+# Scheddy
+## Sam's scheduling friend.
