@@ -95,7 +95,7 @@ def writeNewEvents(service, uniEvents):
             'reminders': {
                 'useDefault': True,
             },
-            'colorId': event.name
+            'colorId': 10
         }
         service.events().insert(calendarId='primary', body=eventDict).execute()
         print("    Writing " + str(event.name )+ " on " + str(event.begin) + " (" + str(i) + " of " + str(len(uniEvents)) +  ")")
