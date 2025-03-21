@@ -18,6 +18,7 @@ from google.auth import default
 from getical import getUniEvents
 import consts
 import requests
+import csv
 
 from ics import Calendar,Event
 
@@ -29,6 +30,7 @@ def authenticate():
   creds, _ = default(scopes=SCOPES)
   return creds
 
+# Sends a pushover message
 def notify (title, message, priority):
     url = 'https://api.pushover.net/1/messages.json'
     myobj = {'token': consts.API_KEY_Pushover,
@@ -39,10 +41,7 @@ def notify (title, message, priority):
 
     x = requests.post(url, json = myobj)
 
-
-def setEvent(creds):
-    service = build("calendar", "v3", credentials=creds)
-
+# Clears the calendar of any Scheddy events
 def delOldEvents(service): 
     events_2025 = []
 
@@ -74,14 +73,27 @@ def delOldEvents(service):
         print("    Removing event " + id["summary"] + " (" + str(i) + " of " + str(len(ids)) +  ")")
         service.events().delete(calendarId='primary', eventId=id["id"]).execute()
 
-
+# Writes new events to the calendar, according to the <uniEvents> calendar. 
 def writeNewEvents(service, uniEvents):
     print("~ Writing " + str(len(uniEvents)) + " new events. ~")
+
+    nameMap = {}
+
+    with open('Documents/scheddy/nameMap.csv', 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            nameMap[row[0]] = row[1]
+
+
     i=0
     for event in uniEvents:
+        if "Lecture" in ''.join([i for i in event.name.split(", ")[1] if not i.isdigit()]):
+            colour = 2
+        else: 
+            colour = 10
         i += 1
         eventDict = {
-            'summary': event.name,
+            'summary': nameMap[event.name.split(", ")[0]] + " " + ''.join([i for i in event.name.split(", ")[1] if not i.isdigit()]), 
             'location': str(event.location),
             'description': 'Event created by SamCalBot',
             'start': {
@@ -95,11 +107,13 @@ def writeNewEvents(service, uniEvents):
             'reminders': {
                 'useDefault': True,
             },
-            'colorId': 10
+            'colorId': colour
         }
         service.events().insert(calendarId='primary', body=eventDict).execute()
         print("    Writing " + str(event.name )+ " on " + str(event.begin) + " (" + str(i) + " of " + str(len(uniEvents)) +  ")")
 
+
+# Main ##########################################################################################
 
 if __name__ == "__main__":
     print("Authenticating...")

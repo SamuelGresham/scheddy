@@ -1,2 +1,7 @@
 consts.py
 cache.txt
+/__pycache__
+/.github
+/scheddy_venv
+requirements.txt
+
